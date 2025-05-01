@@ -1,18 +1,9 @@
-/*
-#[test_only]
-module gatecrash_backend::gatecrash_backend_tests;
-// uncomment this line to import the module
-// use gatecrash_backend::gatecrash_backend;
+module 0x0::gatecrash_backend_tests {
 
-const ENotImplemented: u64 = 0;
-
-#[test]
-fun test_gatecrash_backend() {
-    // pass
+    #[test]
+    public fun sanity_check() {
+        // This is a placeholder test that always passes
+        // and confirms the test system works.
+        assert!(true, 0);
+    }
 }
-
-#[test, expected_failure(abort_code = ::gatecrash_backend::gatecrash_backend_tests::ENotImplemented)]
-fun test_gatecrash_backend_fail() {
-    abort ENotImplemented
-}
-*/
