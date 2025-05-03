@@ -38,8 +38,3 @@ coverage/
 
 # local tools
 *.swp
-
-# lock files (optional: only ignore if you don't want to commit them)
-# yarn.lock
-# package-lock.json
-# pnpm-lock.yaml
