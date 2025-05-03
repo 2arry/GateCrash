@@ -1,48 +1,54 @@
 module gatecrash_backend::ticket {
-
-    use sui::object::{UID, new};
+    use sui::object::{UID, ID, new};
     use sui::tx_context::TxContext;
     use sui::transfer;
-    use sui::event;
 
-    /// Ticket struct — stored as an NFT object on-chain
-    public struct Ticket has key, store {
+    /// NFT struct with metadata that references image by ID
+    public struct NFT has key, store {
         id: UID,
-        event_name: vector<u8>,
-        used: bool,
+        name: vector<u8>,
+        description: vector<u8>,
+        image_id: ID,
     }
 
-    /// Event to log ticket usage
-    public struct TicketUsedEvent has copy, drop, store {
-        event_name: vector<u8>,
-    }
-
-    /// Mint a new ticket and transfer it to a recipient's wallet
-    public fun mint_ticket(recipient: address, event_name: vector<u8>, ctx: &mut TxContext) {
-        let ticket = Ticket {
+    /// Mint an NFT that references an on-chain stored image by object ID
+    public fun mint_ticket(
+        recipient: address,
+        name: vector<u8>,
+        description: vector<u8>,
+        image_id: ID,
+        ctx: &mut TxContext
+    ) {
+        let nft = NFT {
             id: new(ctx),
-            event_name,
-            used: false,
+            name,
+            description,
+            image_id,
         };
-        transfer::transfer(ticket, recipient);
+        transfer::public_transfer(nft, recipient);
+    }
+}
+
+module gatecrash_backend::assets {
+    use sui::object::{UID, ID, new, id};
+    use sui::tx_context::TxContext;
+
+    /// Stores full image data (e.g. base64 or raw PNG) as a standalone object
+    public struct TicketImage has key, store {
+        id: UID,
+        data: vector<u8>,
     }
 
-    /// Use the ticket — marks as used and emits event
-    public fun use_ticket(ticket: &mut Ticket) {
-        assert!(!ticket.used, 0);
-        ticket.used = true;
-        event::emit(TicketUsedEvent {
-            event_name: ticket.event_name,
-        });
+    /// Create and return a new TicketImage object on-chain
+    public fun store_image(data: vector<u8>, ctx: &mut TxContext): TicketImage {
+        TicketImage {
+            id: new(ctx),
+            data,
+        }
     }
 
-    /// Return whether a ticket has been used (can be queried by UI/API)
-    public fun is_used(ticket: &Ticket): bool {
-        ticket.used
-    }
-
-    /// Return event name of ticket
-    public fun get_event_name(ticket: &Ticket): vector<u8> {
-        ticket.event_name
+    /// Get the object ID of the TicketImage object
+    public fun get_image_id(image: &TicketImage): ID {
+        id(image)
     }
 }
