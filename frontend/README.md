@@ -87,10 +87,4 @@ Then navigate into the correct folder and reinstall.
 
 ---
 
-## 🖼 Making this README Canvas‑Friendly
-
-1. Open your preferred Markdown‑enabled **Canvas** page.
-2. Paste everything in this code block.
-3. Save – all formatting & code fences are preserved for easy copying.
-
 Happy building! 🚀
