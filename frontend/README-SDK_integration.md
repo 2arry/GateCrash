@@ -1,6 +1,6 @@
 # GateCrash Frontend Integration Guide (Sui Blockchain)
 
-Welcome to the GateCrash frontend repo! This guide is tailored for an experienced frontend developer who may be new to Web3/Sui. It explains how to connect the GateCrash UI to Sui blockchain smart contracts so users can:
+Welcome to the GateCrash frontend repo! This guide is designed to explains how to connect the GateCrash UI to Sui blockchain smart contracts so users can:
 
 * Connect their Sui wallet
 * Mint NFT tickets
