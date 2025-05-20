@@ -74,28 +74,11 @@ module gatecrash_backend::ticket {
         event_ts:       u64,
         num_tickets:    u64,
         enable_resell:  bool,
-        enable_kiosk:   bool,
-        gas_budget:     u64,
-        mut fee_coin:   Coin<SUI>,
+        // enable_kiosk:   bool,
+        // gas_budget:     u64,
+        // mut fee_coin:   Coin<SUI>,
         ctx:            &mut TxContext,
-    ): vector<NFT> {
-        /* ---------- 0. charge the mint fee ---------------------- */
-        let mint_fee = gas_budget * 10;
-        assert!(coin::value(&fee_coin) >= mint_fee, EWrongFee);
-
-        // `split` returns a new coin holding `mint_fee` SUI.
-        let fee_part = coin::split(&mut fee_coin, mint_fee, ctx);
-        // Send the actual fee to the treasury and the remaining balance
-        // (if any) back to the recipient.
-        transfer::public_transfer(fee_part, TREASURY);
-        transfer::public_transfer(fee_coin,  recipient);
-
-        /* ---------- 1. mint the NFTs ---------------------------- */
-        if (num_tickets == 0) {
-            return vector::empty<NFT>()
-        };
-
-        let mut tickets = vector::empty<NFT>();
+    ) {
         let mut i = 0u64;
         while (i < num_tickets) {
             let mut nft = NFT {
@@ -107,24 +90,10 @@ module gatecrash_backend::ticket {
                 enable_resell,
             };
             add_display(&mut nft);
-            vector::push_back(&mut tickets, nft);
+            transfer::public_transfer(nft, recipient);
             i = i + 1;
         };
-
-        /* ---------- 2. deliver ---------------------------------- */
-        if (!enable_kiosk) {
-            let mut j = 0u64;
-            let total = vector::length(&tickets);
-            while (j < total) {
-                let t = vector::pop_back(&mut tickets);
-                transfer::public_transfer(t, recipient);
-                j = j + 1;
-            };
-        };
-
-        tickets
     }
-
     /// Check if an NFT is already expired with respect to `now_sec`.
     public fun is_expired(nft: &NFT, now_sec: u64): bool {
         nft.event_ts != 0 && now_sec >= nft.event_ts

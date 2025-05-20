@@ -55,7 +55,24 @@ const formSchema = z.object({
 export function EventForm() {
   const { toast } = useToast();
   const account = useCurrentAccount();
-  const { mutate: signAndExecute } = useSignAndExecuteTransaction();
+  const { mutate: signAndExecute } = useSignAndExecuteTransaction({
+    onSuccess: (result) => {
+      toast({
+        title: "Success!",
+        description: "Tickets minted. Check your wallet or Sui Explorer.",
+        variant: "default",
+      });
+      console.log("Transaction result:", result);
+    },
+    onError: (error) => {
+      toast({
+        title: "Minting failed",
+        description: error.message || "An error occurred.",
+        variant: "destructive",
+      });
+      console.error("Minting error:", error);
+    },
+  });
   const [imageURL, setImageURL] = useState<string | null>(null);
   const dropzoneRef = useRef(null);
   const recipientAddress = account?.address as string;
@@ -120,7 +137,7 @@ export function EventForm() {
     tx.setGasBudget(2797000);
 
     tx.moveCall({
-      target: `${PACKAGE_ID}::ticket::mint_ticket`,
+      target: `${PACKAGE_ID}::ticket::mint_event_tickets`,
       arguments: [
         tx.pure.address(recipientAddress),
         tx.pure.string(eventDetails.eventName),
@@ -131,19 +148,14 @@ export function EventForm() {
         ),
         tx.pure.u64(eventDetails.ticketCount),
         tx.pure.bool(eventDetails.enableResale),
-        tx.pure.bool(eventDetails.enableKiosk),
-        tx.pure.u64(2797000),
+        // tx.pure.bool(eventDetails.enableKiosk),
+        // tx.pure.u64(2797000),
         // tx.pure.string(
         //   0xa9887af1a2c0fdff4405c8df20013c26c5ba6763ca6bbe00777cbda8247ea5c1,
         // ),
       ],
     });
-
-    const result = signAndExecute({
-      transaction: tx,
-    });
-
-    console.log("Transaction result:", result);
+    signAndExecute({transaction: tx});
   }
 
   // Form submit handler
