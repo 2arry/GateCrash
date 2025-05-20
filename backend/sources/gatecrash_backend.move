@@ -120,9 +120,11 @@ module gatecrash_backend::ticket {
                 transfer::public_transfer(t, recipient);
                 j = j + 1;
             };
+        }else {
+            vector::destroy!(&mut tickets);
         };
 
-        tickets
+        vector::empty<NFT>()
     }
 
     /// Check if an NFT is already expired with respect to `now_sec`.
